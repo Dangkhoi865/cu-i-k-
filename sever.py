@@ -18,10 +18,16 @@ app.secret_key = os.environ.get("FLASK_SECRET","change_this_secret_for_prod")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# ---- Database helpers ----
-def init_db():
-    con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
+# Init DB
+init_db()
+
+# In-memory online users and rooms
+users_online = {}  # username -> avatar
+rooms = {"general": []}
+
+# Helpers
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXT
     cur.execute("""CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
